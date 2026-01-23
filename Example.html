@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="200" height="100">
+    Your browser does not support the HTML canvas element.
+</canvas>
+<script src="choppy.js"></script>
+<script>
+    var choppy = new Choppy("myCanvas");
+
+    // Scene 0: Forest
+    choppy.sceneCreate(`
+        // Define drawings once (or update them dynamically)
+        escenaActual.layers[0] = "ctx.fillStyle = 'green'; ctx.fillRect(0,0,200,100);"; // Floor
+        escenaActual.layers[2] = "ctx.fillStyle = 'white'; ctx.fillText('Level: Forest', 10, 20);"; // UI
+    `, "Forest");
+
+    // Scene 1: Cave
+    choppy.sceneCreate(`
+        escenaActual.layers[0] = "ctx.fillStyle = 'black'; ctx.fillRect(0,0,200,100);"; // Dark background
+        escenaActual.layers[1] = "ctx.fillStyle = 'gray'; ctx.fillRect(50,50,20,20);";   // A rock
+    `, "Cave");
+
+    choppy.play(); // Launch the game loop
+
+    // Example of scene transition after 2 seconds
+    setTimeout(() => {
+        choppy.setScene(1);
+    }, 2000);
+</script>
+</body>
+</html>
