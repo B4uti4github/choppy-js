@@ -32,14 +32,14 @@ Choppy is not a heavy framework; it's a high-speed abstraction script for develo
     // Scene 0: Forest
     choppy.sceneCreate(`
         // Define drawings once (or update them dynamically)
-        escenaActual.layers[0] = "ctx.fillStyle = 'green'; ctx.fillRect(0,0,200,100);"; // Floor
-        escenaActual.layers[2] = "ctx.fillStyle = 'white'; ctx.fillText('Level: Forest', 10, 20);"; // UI
+        actualScene.layers[0] = "ctx.fillStyle = 'green'; ctx.fillRect(0,0,200,100);"; // Floor
+        actualScene.layers[2] = "ctx.fillStyle = 'white'; ctx.fillText('Level: Forest', 10, 20);"; // UI
     `, "Forest");
 
     // Scene 1: Cave
     choppy.sceneCreate(`
-        escenaActual.layers[0] = "ctx.fillStyle = 'black'; ctx.fillRect(0,0,200,100);"; // Dark background
-        escenaActual.layers[1] = "ctx.fillStyle = 'gray'; ctx.fillRect(50,50,20,20);";   // A rock
+        actualScene.layers[0] = "ctx.fillStyle = 'black'; ctx.fillRect(0,0,200,100);"; // Dark background
+        actualScene.layers[1] = "ctx.fillStyle = 'gray'; ctx.fillRect(50,50,20,20);";   // A rock
     `, "Cave");
 
     choppy.play(); // Launch the game loop
