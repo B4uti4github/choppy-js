@@ -49,14 +49,14 @@ class Choppy {
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             
             // Use this in the eval scripts to access the current scene
-            const escenaActual = this.scenes[this.currentScene];
+            const actualScene = this.scenes[this.currentScene];
 
             // 1. Run Logic from the current scene
-            eval(escenaActual.script);
+            eval(actualScene.script);
 
             // 2. Draw Layers in order
-            Object.keys(escenaActual.layers).sort().forEach(z => {
-                eval(escenaActual.layers[z]);
+            Object.keys(actualScene.layers).sort().forEach(z => {
+                eval(actualScene.layers[z]);
             });
 
             requestAnimationFrame(loop);

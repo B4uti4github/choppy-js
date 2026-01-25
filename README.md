@@ -1,4 +1,4 @@
-# 🌊 Choppy Engine v1.0
+# 🌊 Choppy Engine v1.1
 **The ultra-lightweight game orchestration layer for Canvas API.**
 
 Choppy is not a heavy framework; it's a high-speed abstraction script for developers who love the **Canvas API** but hate managing scenes in visual engines, Z-orders, and game loops from scratch. It's designed for **speed-running game development** and rapid prototyping.
@@ -68,5 +68,7 @@ This project is licensed under the MIT License. This means you **must** keep the
 
 Example: "Built with ChoppyJS by B4uti4GD"
 
+## Documentation:
+Here has documentation of various examples for how use and feel free to use this examples in [this folder](./examples/)
 
 Made by me with a little help from AI 😉. Go build something fast!
