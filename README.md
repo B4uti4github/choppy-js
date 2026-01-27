@@ -48,7 +48,7 @@ choppy.sceneCreate(function(scene, ctx, deltaTime) {
 1. In the body tag:
 ```html
 <canvas id="myCanvas" width="200" height="100"></canvas>
-<script src="choppy.js"></script>
+<script src="https://unpkg.com/choppy2d-js"></script>
 ```
 
 2. Create your Game Logic
