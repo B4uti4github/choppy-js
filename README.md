@@ -1,4 +1,4 @@
-# 🌊 Choppy Engine v1.1
+# 🌊 Choppy Engine v1.2
 **The ultra-lightweight game orchestration layer for Canvas API.**
 
 Choppy is not a heavy framework; it's a high-speed abstraction script for developers who love the **Canvas API** but hate managing scenes in visual engines, Z-orders, and game loops from scratch. It's designed for **speed-running game development** and rapid prototyping.
@@ -10,10 +10,37 @@ Choppy is not a heavy framework; it's a high-speed abstraction script for develo
 *   **Pure Canvas API**: If you know `ctx.fillRect()` and CanvasAPI, you already know Choppy.
 *   **Zero Overhead**: A single, tiny JS file. No dependencies. No bloat.
 *   **Dynamic Scripting**: Use the power of string-based logic (`eval`) for instant prototyping.
-*   **Scene-Based Z-Order**: Each scene manages its own independent rendering layers (Background, Game, UI).
 *   **Semi-Recursive Flow**: Change scenes and modify the engine state directly from within your scene scripts.
 
 ---
+
+## What is new?
+
+The new here in version 1.2 is that we've added a quality-of-life improvement with enhanced security by removing everything from `eval()`, making it safer, which leads us to upload it to unpkg/npm. We removed Layers, then so if you wants layers, you need to code in this style:
+<hr>
+
+    Correct ✅:
+```js
+// Scene 1: Green and white
+choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,200,100);
+
+
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0,50,50);
+}, "Cave");
+```
+    Incorrect ❌: 
+```js
+// Scene 1: Green and white
+choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,200,100);
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0,50,50);
+}, "Cave");
+ ```
 
 ## 🚀 Quick Start (Speed-run style)
 
@@ -29,18 +56,28 @@ Choppy is not a heavy framework; it's a high-speed abstraction script for develo
 <script>
     var choppy = new Choppy("myCanvas");
 
-    // Scene 0: Forest
-    choppy.sceneCreate(`
-        // Define drawings once (or update them dynamically)
-        actualScene.layers[0] = "ctx.fillStyle = 'green'; ctx.fillRect(0,0,200,100);"; // Floor
-        actualScene.layers[2] = "ctx.fillStyle = 'white'; ctx.fillText('Level: Forest', 10, 20);"; // UI
-    `, "Forest");
+    // Scene 1: Green and white
+    choppy.sceneCreate(function(scene, ctx, deltaTime) {
 
-    // Scene 1: Cave
-    choppy.sceneCreate(`
-        actualScene.layers[0] = "ctx.fillStyle = 'black'; ctx.fillRect(0,0,200,100);"; // Dark background
-        actualScene.layers[1] = "ctx.fillStyle = 'gray'; ctx.fillRect(50,50,20,20);";   // A rock
-    `, "Cave");
+        ctx.fillStyle = 'green';
+        ctx.fillRect(0,0,200,100);
+
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0,0,50,50);
+
+    }, "Cave");
+    // Scene 2: Green and black
+    choppy.sceneCreate(function(scene, ctx, deltaTime) {
+
+        ctx.fillStyle = 'green';
+        ctx.fillRect(0,0,200,100);
+
+
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0,0,50,50);
+
+    }, "Cave");
 
     choppy.play(); // Launch the game loop
 
@@ -53,12 +90,8 @@ Choppy is not a heavy framework; it's a high-speed abstraction script for develo
 💡 Important Tips 🔥
 Scene Management: Choppy provides a lightweight display list. You can switch scenes instantly without memory leaks.
 Extensibility: You can extend the Choppy class easily to add physics or sound systems.
-Security Disclaimer: This script uses eval() for extreme flexibility and speed. Be careful when copying scripts from untrusted sites; malicious code could be hidden in strings. Always know what your eval strings are doing.
 
 ## Usage & Credits
-
-### 📦 Local Installation Only
-For security reasons (due to the use of `eval()`), **ChoppyJS must be hosted locally**. Do not link to this script via a CDN. Download the `choppy.js` file and include it directly in your project's ZIP or repository.
 
 ### 📜 Attribution
 This project is licensed under the MIT License. This means you **must** keep the copyright notice in the code. Additionally, we highly recommend and appreciate it if you credit **ChoppyJS** in:

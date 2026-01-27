@@ -13,18 +13,28 @@
 <script>
     var choppy = new Choppy("myCanvas");
 
-    // Scene 0: Forest
-    choppy.sceneCreate(`
-        // Define drawings once (or update them dynamically)
-        actualScene.layers[0] = "ctx.fillStyle = 'green'; ctx.fillRect(0,0,200,100);"; // Floor
-        actualScene.layers[2] = "ctx.fillStyle = 'white'; ctx.fillText('Level: Forest', 10, 20);"; // UI
-    `, "Forest");
+    // Scene 1: Green and white
+    choppy.sceneCreate(function(scene, ctx, deltaTime) {
+        
+        ctx.fillStyle = 'green';
+        ctx.fillRect(0,0,200,100);
 
-    // Scene 1: Cave
-    choppy.sceneCreate(`
-        actualScene.layers[0] = "ctx.fillStyle = 'black'; ctx.fillRect(0,0,200,100);"; // Dark background
-        actualScene.layers[1] = "ctx.fillStyle = 'gray'; ctx.fillRect(50,50,20,20);";   // A rock
-    `, "Cave");
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0,0,50,50);
+
+    }, "Cave");
+    // Scene 2: Green and black
+    choppy.sceneCreate(function(scene, ctx, deltaTime) {
+
+        ctx.fillStyle = 'green';
+        ctx.fillRect(0,0,200,100);
+
+
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0,0,50,50);
+
+    }, "Cave");
 
     choppy.play(); // Launch the game loop
 
