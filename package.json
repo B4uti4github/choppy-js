@@ -1,6 +1,6 @@
 {
-  "name": "choppy-js",
-  "version": "1.2",
+  "name": "choppy2d-js",
+  "version": "1.0.0",
   "description": "**The ultra-lightweight game orchestration layer for Canvas API.**",
   "main": "choppy.js",
   "directories": {
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/B4uti4github/choppy-js.git"
   },
   "keywords": ["Canvas","Game Development","2D Games","Game Framework", "Game Script"],
-  "author": "B4uti4GD",
+  "author": "b4uti4gd",
   "license": "MIT",
   "type": "commonjs",
   "bugs": {
