@@ -10,7 +10,7 @@
 * Semi-Recursive Flow: Change scenes and modify the engine state directly from within your scene scripts.
 
 ## What is new?
->The new here in version 1.3 is that we've added a quality-of-life improvement suggested by FuukoTaki: now you can set a scene using its name. We also added support for other frameworks and the init function. This function runs once when the scene is created to initialize variables, while the main loop handles the logic :DDD.
+>The new here in version 1.5 is that we've added a quality-of-life improvement suggested by FuukoTaki: now you can set a scene using its name. We also added support for other frameworks and the init function. This function runs once when the scene is created to initialize variables, while the main loop handles the logic :DDD.
 >>Note for WebGL/Frameworks: If you use OpenFL, set the third argument to true. If you use WebGL, set the second argument to true (recommended only with OnlyFrameMode).
 Remeber that in Openfl or other frameworks with an system of charcaters, delete the global characters in the init of the next scene of that charcaters
 
