@@ -1,107 +1,123 @@
-# 🌊 Choppy Engine v1.2
-**The ultra-lightweight game orchestration layer for Canvas API.**
+# 🌊 Choppy Engine v1.5
+### The ultra-lightweight game orchestration layer for Canvas API.
 
-Choppy is not a heavy framework; it's a high-speed abstraction script for developers who love the **Canvas API** but hate managing scenes in visual engines, Z-orders, and game loops from scratch. It's designed for **speed-running game development** and rapid prototyping.
-
----
-
+> Choppy is not a heavy framework; it's a high-speed abstraction script for developers who love the Canvas API but hate managing scenes in visual engines, Z-orders, and game loops from scratch. It's designed for speed-running game development and rapid prototyping. (Recommended use the local version for not updating every time when choppy its updated in UNPKG)
 ## 🔥 Why Choppy?
-
-*   **Pure Canvas API**: If you know `ctx.fillRect()` and CanvasAPI, you already know Choppy.
-*   **Zero Overhead**: A single, tiny JS file. No dependencies. No bloat.
-*   **Dynamic Scripting**: Use the power of string-based logic (`eval`) for instant prototyping.
-*   **Semi-Recursive Flow**: Change scenes and modify the engine state directly from within your scene scripts.
-
----
+* Pure Canvas API: If you know ctx.fillRect() and CanvasAPI, you already know Choppy (if you don't use other framework and it's not using WebGL).
+* Zero Overhead: A single, tiny JS file. No dependencies. No bloat.
+* Compatibility with other frameworks: Yes, You can use OpenFL and others frameworks.
+* Scenes Managing: Very easy to make and change scenes :D.
+* Semi-Recursive Flow: Change scenes and modify the engine state directly from within your scene scripts.
 
 ## What is new?
+>The new here in version 1.3 is that we've added a quality-of-life improvement suggested by FuukoTaki: now you can set a scene using its name. We also added support for other frameworks and the init function. This function runs once when the scene is created to initialize variables, while the main loop handles the logic :DDD.
+>>Note for WebGL/Frameworks: If you use OpenFL, set the third argument to true. If you use WebGL, set the second argument to true (recommended only with OnlyFrameMode).
+Remeber that in Openfl or other frameworks with an system of charcaters, delete the global characters in the init of the next scene of that charcaters
 
-The new here in version 1.2 is that we've added a quality-of-life improvement with enhanced security by removing everything from `eval()`, making it safer, which leads us to upload it to unpkg/npm. We removed Layers, then so if you wants layers, you need to code in this style:
-<hr>
-
-    Correct ✅:
+## 🎨 Drawing Perspective: Layers & Performance
+1. Simulating Layers (Z-Index)
+In Choppy, the order of your code defines the layers. Elements drawn later appear on top of earlier ones.
+Correct ✅ (Clean Layering):
 ```js
-// Scene 1: Green and white
 choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    // Layer 1: Background (Bottom)
     ctx.fillStyle = 'green';
     ctx.fillRect(0,0,200,100);
 
-
+    // Layer 2: Entity (Top)
     ctx.fillStyle = 'white';
     ctx.fillRect(0,0,50,50);
 }, "Cave");
 ```
-    Incorrect ❌: 
+
+
+2. Performance: Init vs Script
+The init function is for setup. The script loop is for logic. Never initialize heavy variables or sprites inside the loop!
+Correct ✅ (Optimized):
 ```js
-// Scene 1: Green and white
-choppy.sceneCreate(function(scene, ctx, deltaTime) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0,0,200,100);
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0,0,50,50);
-}, "Cave");
- ```
+choppy.sceneCreate(
+    function(scene, ctx, delta) { 
+        // Logic: Move things
+        window.playerX += 10 * delta;
+    }, 
+    "Level1", 
+    function() { 
+        // Setup: Run once
+        window.playerX = 0; 
+    }
+);
+```
+Incorrect ❌ (Memory Leak):
+```js
+choppy.sceneCreate(function(scene, ctx, delta) {
+    window.playerX = 0; // ERROR: Resets every frame!
+    window.sprite = new openfl.display.Sprite(); // ERROR: 60 objects per second!
+}, "Level1");
+```
+
+🧩 Integration with OpenFL (Hybrid Mode)
+For frameworks like OpenFL, Choppy acts as the Logic Brain. Remeber that in Openfl or other frameworks with an system of charcaters, delete the global characters in the init of the next scene of that charcaters
+```js
+var choppy = new Choppy("myCanvas", false, true); // framework_Used = true
+
+choppy.sceneCreate(
+    function(scene, ctx, delta) {
+        window.player.x += 10 * delta; // Physics/Logic
+    },
+    "GameScene",
+    function() {
+        window.player = new openfl.display.Sprite(); // Visual Setup
+        openfl.Lib.current.stage.addChild(window.player);
+    }
+);
+
+// Call in OpenFL's ENTER_FRAME
+openfl.Lib.current.stage.addEventListener("enterFrame", function(e) {
+    choppy.play(true); // onlyFrameMode = true
+});
+```
 
 ## 🚀 Quick Start (Speed-run style)
 
-### 1. Setup your HTML
-1. In the body tag:
+1. Setup your HTML
 ```html
 <canvas id="myCanvas" width="200" height="100"></canvas>
-<script src="https://unpkg.com/choppy2d-js"></script>
+<script src="choppy.js" alt="https://unpkg.com/choppy.js"></script>
 ```
 
 2. Create your Game Logic
 ```html
 <script>
-    var choppy = new Choppy("myCanvas");
+var choppy = new Choppy("myCanvas");
 
-    // Scene 1: Green and white
-    choppy.sceneCreate(function(scene, ctx, deltaTime) {
+// Scene 1: Cave
+choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,200,100);
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0,50,50);
+}, "Cave");
 
-        ctx.fillStyle = 'green';
-        ctx.fillRect(0,0,200,100);
+// Scene 2: Dark Cave
+choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,200,100);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,0,50,50);
+}, "DarkCave");
 
+choppy.play(); // Launch the game loop
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0,0,50,50);
-
-    }, "Cave");
-    // Scene 2: Green and black
-    choppy.sceneCreate(function(scene, ctx, deltaTime) {
-
-        ctx.fillStyle = 'green';
-        ctx.fillRect(0,0,200,100);
-
-
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0,0,50,50);
-
-    }, "Cave");
-
-    choppy.play(); // Launch the game loop
-
-    // Example of scene transition after 2 seconds
-    setTimeout(() => {
-        choppy.setScene(1);
-    }, 2000);
+// Example: Switch scene after 2 seconds
+setTimeout(() => {
+    choppy.setScene("DarkCave");
+}, 2000);
 </script>
 ```
-💡 Important Tips 🔥
-Scene Management: Choppy provides a lightweight display list. You can switch scenes instantly without memory leaks.
-Extensibility: You can extend the Choppy class easily to add physics or sound systems.
 
-## Usage & Credits
-
-### 📜 Attribution
-This project is licensed under the MIT License. This means you **must** keep the copyright notice in the code. Additionally, we highly recommend and appreciate it if you credit **ChoppyJS** in:
-*   Your project's `README.md`.
-*   Your game's "Credits" screen.
-*   The "Tools Used" section of your game's page.
-
+## 📜 Usage & Credits
+Attribution
+This project is licensed under the MIT License. You must keep the copyright notice. Please credit ChoppyJS in your project's README.md or Credits screen!
 Example: "Built with ChoppyJS by B4uti4GD"
-
-## Documentation:
-Here has documentation of various examples for how use and feel free to use this examples in [this folder](./examples/)
 
 Made by me with a little help from AI 😉. Go build something fast!

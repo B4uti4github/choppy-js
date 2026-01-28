@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="../../favicon.png" type="image/png">
+    <title>ChoppyJS + OpenFL WebGL Example</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        /* El canvas que crea OpenFL por defecto ocupa todo el div */
+        #openfl-content canvas { border: 1px solid white; } 
+    </style>
+</head>
+<body>
+    <!-- OpenFL montará su canvas dentro de este div -->
+    <div id="openfl-content"></div>
+
+    <!-- Cargar OpenFL -->
+    <script src="https://cdn.jsdelivr.net/npm/openfl@9.3.3/dist/openfl.min.js"></script>
+
+    <!-- Cargar tu motor ChoppyJS -->
+    <script src="../../choppy.js"></script>
+
+    <script>
+        // ======================================================
+        //                  SETUP INICIAL Y VARIABLES
+        // ======================================================
+
+        // --- 1. Setup de OpenFL (Crea el canvas y lo adjunta) ---
+        stage = new openfl.display.Stage(750, 600); 
+        openfl.Lib.current.stage = stage;
+        document.getElementById("openfl-content").appendChild(stage.element);
+
+        // --- 2. Corrección para ChoppyJS ---
+        const openflCanvasElement = document.querySelector("#openfl-content canvas");
+        var choppy = new Choppy(openflCanvasElement, true, true); 
+        
+        // --- 3. Input de Teclado Global ---
+        window.keys = {};
+        document.addEventListener('keydown', (e) => { window.keys[e.key] = true; });
+        document.addEventListener('keyup', (e) => { window.keys[e.key] = false; });
+
+        // --- 4. Variables de Juego Globales ---
+        let scoreP1 = 0;
+        let scoreP2 = 0;
+        const MAX_SCORE = 7;
+        let ball, player1, player2;
+        let ballSpeedX = 250; // Pixeles por segundo
+        let ballSpeedY = 250; 
+        const BALL_SIZE = 15;
+        const PADDLE_SPEED = 300; // Aumentamos velocidad para que se note con el delta time
+
+        // ======================================================
+        //                FUNCIONES DE AYUDA DEL JUEGO
+        // ======================================================
+
+        function resetBall() {
+            ball.x = 750 / 2 - BALL_SIZE / 2;
+            ball.y = 600 / 2 - BALL_SIZE / 2;
+            // Invertir dirección inicial aleatoriamente
+            ballSpeedX = Math.random() > 0.5 ? 250 : -250;
+            ballSpeedY = Math.random() > 0.5 ? 250 : -250;
+        }
+
+        // ======================================================
+        //                   DEFINICIÓN DE ESCENAS
+        // ======================================================
+
+        // --- ESCENA DE MENÚ ---
+        choppy.sceneCreate(
+            function(scene, delta) {
+                // No hay lógica de actualización en el menú
+            },
+            "MenuScene",
+            function() { // onEnter
+                const menuText = new openfl.text.TextField();
+                menuText.text = "Ping Pong OpenFL + ChoppyJS\n Click o Enter para empezar";
+                menuText.autoSize = openfl.text.TextFieldAutoSize.CENTER;
+                menuText.x = 375 - menuText.width / 2;
+                menuText.y = 200;
+                openfl.Lib.current.stage.addChild(menuText);
+
+                function startGame(e) {
+                    if(e.type === "click" || e.key === "Enter") {
+                        openfl.Lib.current.stage.removeChild(menuText);
+                        choppy.setScene("GameScene");
+                        // Limpiar listeners para que no se acumulen
+                        openfl.Lib.current.stage.removeEventListener("click", startGame);
+                        document.removeEventListener('keydown', startGame);
+                    }
+                }
+                openfl.Lib.current.stage.addEventListener("click", startGame);
+                document.addEventListener('keydown', startGame);
+            }
+        );
+
+        // --- ESCENA DE VICTORIA ---
+        choppy.sceneCreate(
+            function(scene, delta) {
+                // No hay lógica de actualización en la victoria
+            },
+            "WinScene",
+function() { 
+    // Usamos la variable global stage que definiste al inicio
+    const stg = window.stage || openfl.Lib.current.stage; 
+
+    // Limpieza específica de objetos globales
+    if (ball && ball.parent) ball.parent.removeChild(ball);
+    if (player1 && player1.parent) player1.parent.removeChild(player1);
+    if (player2 && player2.parent) player2.parent.removeChild(player2);
+
+    const winnerText = new openfl.text.TextField();
+    // Tip: Añade formato para asegurar que se vea en el canvas de OpenFL
+    winnerText.defaultTextFormat = new openfl.text.TextFormat("_sans", 24, 0x000000);
+    winnerText.text = (scoreP1 >= MAX_SCORE ? "Jugador 1 Gana!" : "Jugador 2 Gana!") + 
+                      "\n Volviendo al menú en 5s...";
+    winnerText.autoSize = openfl.text.TextFieldAutoSize.CENTER;
+    winnerText.x = 375 - winnerText.width / 2;
+    winnerText.y = 250;
+
+    if (stg) {
+        stg.addChild(winnerText);
+    }
+
+    setTimeout(() => {
+        if (winnerText.parent) {
+            winnerText.parent.removeChild(winnerText);
+        }
+        choppy.setScene("MenuScene");
+    }, 5000);
+}
+
+        );
+
+
+        // --- ESCENA DE JUEGO (GAME SCENE) ---
+        choppy.sceneCreate(
+            function(scene, delta) { // delta ya funciona bien aquí (segundos)
+                // --- Lógica de Input y límites de paletas ---
+                // P1 (WASD)
+                if (!(ball && player1 && player2)) {
+                } else { 
+                    
+                if (window.keys['w']) player1.y -= PADDLE_SPEED * delta; 
+                if (window.keys['s']) player1.y += PADDLE_SPEED * delta;
+                // P2 (Flechas)
+                if (window.keys['ArrowUp']) player2.y -= PADDLE_SPEED * delta;
+                if (window.keys['ArrowDown']) player2.y += PADDLE_SPEED * delta;
+
+                // Limitar paletas a los bordes de la pantalla (600px de alto)
+                player1.y = Math.max(0, Math.min(600 - player1.height, player1.y));
+                player2.y = Math.max(0, Math.min(600 - player2.height, player2.y));
+
+                // --- Lógica de la Pelota: Movimiento y Colisiones ---
+                ball.x += ballSpeedX * delta;
+                ball.y += ballSpeedY * delta;
+                // Colisión con paredes superior/inferior
+                if (ball.y <= 0 || ball.y + BALL_SIZE >= 600) {
+                    ballSpeedY *= -1;
+                    // Empujoncito para no quedar atrapada en el borde
+                    ball.y = (ball.y <= 0) ? 1 : 600 - BALL_SIZE - 1;
+                }
+
+                // Colisión con Paleta 1 (Izquierda)
+                if (ballSpeedX < 0 && ball.hitTestObject(player1)) {
+                    ballSpeedX *= -1.05; // Invertir y acelerar
+                    ball.x = player1.x + player1.width + 1; // "Empujar" hacia afuera
+                }
+
+                // Colisión con Paleta 2 (Derecha)
+                if (ballSpeedX > 0 && ball.hitTestObject(player2)) {
+                    ballSpeedX *= -1.05; // Invertir y acelerar
+                    ball.x = player2.x - BALL_SIZE - 1; // "Empujar" hacia afuera
+                }
+
+                // Puntuación y Reinicio
+                if (ball.x < 0) {
+                    scoreP2++;
+                    resetBall();
+                }
+                if (ball.x + BALL_SIZE > 750) {
+                    scoreP1++;
+                    resetBall();
+                }
+
+                // Lógica de Ganar/Perder
+                if (scoreP1 >= MAX_SCORE || scoreP2 >= MAX_SCORE) {
+                    choppy.setScene("WinScene");
+                }
+            }
+            },
+            "GameScene",
+            function() { // onEnter (Inicialización al entrar en la escena de juego)
+                scoreP1 = 0;
+                scoreP2 = 0;
+                
+                // Crear Paleta 1
+                player1 = new openfl.display.Sprite();
+                player1.graphics.beginFill(0x00FF00); player1.graphics.drawRect(0, 0, 15, 100);
+                player1.x = 20; player1.y = 250;
+                openfl.Lib.current.stage.addChild(player1);
+
+                // Crear Paleta 2
+                player2 = new openfl.display.Sprite();
+                player2.graphics.beginFill(0x0000FF); player2.graphics.drawRect(0, 0, 15, 100);
+                player2.x = 750 - 20 - 15; player2.y = 250;
+                openfl.Lib.current.stage.addChild(player2);
+                
+                // Crear la Pelota
+                ball = new openfl.display.Sprite();
+                ball.graphics.beginFill(0xFF0000); ball.graphics.drawRect(0, 0, BALL_SIZE, BALL_SIZE);
+                openfl.Lib.current.stage.addChild(ball);
+
+                resetBall();
+            }
+        );
+
+        choppy.setScene("MenuScene");
+
+        // ======================================================
+        //              BUCLE PRINCIPAL (LOOP) Y ARRANQUE
+        // ======================================================
+        
+        // Sincronización de Loops: OpenFL llama a esto en cada frame
+        openfl.Lib.current.stage.addEventListener("enterFrame", function(e) {
+            choppy.play(true); // Pasar el delta como segundo parámetro si Choppy lo espera
+        });
+
+        // Iniciar el juego en la escena del menú
+        
+
+    </script>
+</body>
+</html>

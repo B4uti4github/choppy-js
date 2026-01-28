@@ -3,45 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.png" type="image/png">
     <title>Document</title>
 </head>
 <body>
     <canvas id="myCanvas" width="200" height="100">
         Your browser does not support the HTML canvas element.
     </canvas>
-<script src="https://unpkg.com/choppy2d-js"></script>
+<script src="./choppy.js"></script>
 <script>
-    var choppy = new Choppy("myCanvas");
+var choppy = new Choppy("myCanvas");
 
-    // Scene 1: Green and white
-    choppy.sceneCreate(function(scene, ctx, deltaTime) {
-        
-        ctx.fillStyle = 'green';
-        ctx.fillRect(0,0,200,100);
+// Scene 1: Cave
 
+choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,200,100);
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0,0,50,50);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0,0,50,50);
+}, "DarkCave");
 
-    }, "Cave");
-    // Scene 2: Green and black
-    choppy.sceneCreate(function(scene, ctx, deltaTime) {
+choppy.sceneCreate(function(scene, ctx, deltaTime) {
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,200,100);
 
-        ctx.fillStyle = 'green';
-        ctx.fillRect(0,0,200,100);
-
-
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0,0,50,50);
-
-    }, "Cave");
-
-    choppy.play(); // Launch the game loop
-
-    // Example of scene transition after 2 seconds
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0,50,50);
+}, "Cave",
+function() {
     setTimeout(() => {
-        choppy.setScene(1);
+        choppy.setScene(0);
     }, 2000);
+}
+);
+
+// Scene 2: Dark Cave
+
+choppy.setScene(1)
+
+choppy.play(); // Launch the game loop
+
+// Example: Switch scene after 2 seconds
+
 </script>
 </body>
 </html>
