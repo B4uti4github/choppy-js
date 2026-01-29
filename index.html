@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./favicon.png" type="image/png">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
+</head>
+<body>
+    <header class="bg-dark text-white p-3 mb-4">
+        <h1 class="text-center">ChoppyJS</h1>
+    </header>
+    <section class="container">
+        <script>
+            fetch("README.md")
+            .then(response => response.text())
+            .then(text => {
+                var converter = new showdown.Converter();
+                var html = converter.makeHtml(text);
+                document.querySelector("section.container").innerHTML = html;
+            });
+        </script>
+    </section>
+    <section>
+        <a href="https://github.com/B4uti4github/choppy-js/graphs/contributors">
+            <img src="https://contrib.rocks/image?repo=B4uti4github/choppy-js" />
+        </a>
+
+        Made with [contrib.rocks](https://contrib.rocks).
+    </section>
+    <br/>
+    <style>
+        section {
+            display: block;
+            margin: auto;
+            justify-items: center;
+            text-align: center;
+            max-width: 900px;
+        }
+    </style>
+</body>
+</html>
