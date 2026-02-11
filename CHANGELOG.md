@@ -1,3 +1,22 @@
+# v2.0
+
+## Added
+- **Layer Stacking:** Sequential execution of multiple active scenes (Z-Order).
+- **Instance-Based Logic:** Scenes are now `ChScene` instances with private `this` context.
+- **DNA Mutation (The "Blueprint" Trick):** 
+  - You can define `new ChScene()` molds as "blueprints" and store them without adding them to the engine.
+  - These blueprints consume zero CPU/Execution time until you decide to inject their scripts into a live layer.
+- **Dynamic Hot-Swapping:** Use `changeLayer()` to swap the logic (Init, Scene, End) of a live layer using a blueprint's DNA.
+- **Self-Management:** Built-in `pause()`, `run()`, `reset()`, and `kill()` for every layer.
+- **DeltaTime Clamping:** Lag protection capped at 100ms.
+
+## Changed
+- **High-Level Orchestration:** Refactored from a simple drawing manager to a framework-agnostic logic orchestrator.
+- **Execution Context:** Scripts run via `call(window, this)`, allowing professional OOP patterns and "Hot-Swapping" logic.
+
+## Deprecated
+- **Numeric Indexes:** Removed scene selection by number. Management is now strictly name-based and layer-oriented for professional scalability.
+
 # v1.5
 >The new here in version 1.5 is that we've added a quality-of-life improvement suggested by FuukoTaki: now you can set a scene using its name. We also added support for other frameworks and the init function. This function runs once when the scene is created to initialize variables, while the main loop handles the logic :DDD.
 >>Note for WebGL/Frameworks: If you use OpenFL, set the third argument to true. If you use WebGL, set the second argument to true (recommended only with OnlyFrameMode).

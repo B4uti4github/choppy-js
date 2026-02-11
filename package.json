@@ -1,7 +1,7 @@
 {
   "name": "choppy2d-js",
-  "version": "1.5.4",
-  "description": "**The ultra-lightweight game orchestration layer for Canvas API.**",
+  "version": "2.0.0",
+  "description": "**The ultra-lightweight game orchestration scenes and layers managers for Graphics Frameworks.**",
   "main": "choppy.js",
   "directories": {
     "example": "examples"

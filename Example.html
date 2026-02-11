@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="./favicon.png" type="image/png">
-    <title>Document</title>
+    <title>Choppy2D v2.0 + OpenFL Demo</title>
+    <!-- 1. OpenFL Library via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/openfl@9.5.0/dist/openfl.min.js"></script>
+    <!-- 2. Your Engine (choppy.js) -->
+    <script src="choppy.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #111; }
+        canvas { display: block; margin: 0 auto; }
+    </style>
 </head>
 <body>
-    <canvas id="myCanvas" width="200" height="100">
-        Your browser does not support the HTML canvas element.
-    </canvas>
-<script src="./choppy.js"></script>
+
 <script>
-var choppy = new Choppy("myCanvas");
+    // --- OPENFL SETUP ---
+    const stage = new openfl.display.Stage(800, 600, 0xFFFFFF);
+    document.body.appendChild(stage.element);
 
-// Scene 1: Cave
+    // --- CHOPPY 2.0 LOGIC ---
+    const engine = new Choppy();
 
-choppy.sceneCreate(function(scene, ctx, deltaTime) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0,0,200,100);
+    // Player Layer
+    engine.addLayer(
+        function(self) { 
+            if (this.sprite.x > 800) {
+                this.sprite.x = -50;
+            } else {
+                this.sprite.x += 200 * deltaTime;
+            }
+            this.sprite.rotation += 2;
+        }, 
+        "Player", 
+        function(self) { 
+            this.sprite = new openfl.display.Sprite();
+            this.sprite.graphics.beginFill(0x22AABB);
+            this.sprite.graphics.drawRect(-25, -25, 50, 50);
+            this.sprite.x = 100;
+            this.sprite.y = 300;
+            stage.addChild(this.sprite);
+        },
+        function(self) { 
+            stage.removeChild(this.sprite);
+        }
+    );
 
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0,0,50,50);
-}, "DarkCave");
-
-choppy.sceneCreate(function(scene, ctx, deltaTime) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0,0,200,100);
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0,0,50,50);
-}, "Cave",
-function() {
-    setTimeout(() => {
-        choppy.setScene(0);
-    }, 2000);
-}
-);
-
-// Scene 2: Dark Cave
-
-choppy.setScene(1)
-
-choppy.play(); // Launch the game loop
-
-// Example: Switch scene after 2 seconds
+    // Run Engine
+    engine.play();
 
 </script>
 </body>

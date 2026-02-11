@@ -1,123 +1,102 @@
-# 🌊 Choppy Engine v1.5
-### The ultra-lightweight game orchestration layer for Canvas API.
+# 🌊 Choppy2d-js v2.0
+> **An Scene and Layer manager for games and demos.**
 
-> Choppy is not a heavy framework; it's a high-speed abstraction script for developers who love the Canvas API but hate managing scenes in visual engines, Z-orders, and game loops from scratch. It's designed for speed-running game development and rapid prototyping. (Recommended use the local version for not updating every time when choppy its updated in UNPKG)
-## 🔥 Why Choppy?
-* Pure Canvas API: If you know ctx.fillRect() and CanvasAPI, you already know Choppy (if you don't use other framework and it's not using WebGL).
-* Zero Overhead: A single, tiny JS file. No dependencies. No bloat.
-* Compatibility with other frameworks: Yes, You can use OpenFL and others frameworks.
-* Scenes Managing: Very easy to make and change scenes :D.
-* Semi-Recursive Flow: Change scenes and modify the engine state directly from within your scene scripts.
+**Choppy2d-js** is a high-level logic orchestrator designed to manage scene complexity and multitasking through a robust **Layer System**. It is completely **framework-agnostic**, making it the perfect "Director" for any rendering engine.
 
-## What is new?
->The new here in version 1.5 is that we've added a quality-of-life improvement suggested by FuukoTaki: now you can set a scene using its name. We also added support for other frameworks and the init function. This function runs once when the scene is created to initialize variables, while the main loop handles the logic :DDD.
->>Note for WebGL/Frameworks: If you use OpenFL, set the third argument to true. If you use WebGL, set the second argument to true (recommended only with OnlyFrameMode).
-Remeber that in Openfl or other frameworks with an system of charcaters, delete the global characters in the init of the next scene of that charcaters
+---
 
-## 🎨 Drawing Perspective: Layers & Performance
-1. Simulating Layers (Z-Index)
-In Choppy, the order of your code defines the layers. Elements drawn later appear on top of earlier ones.
-Correct ✅ (Clean Layering):
-```js
-choppy.sceneCreate(function(scene, ctx, deltaTime) {
-    // Layer 1: Background (Bottom)
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0,0,200,100);
+## ✨ Key Features
 
-    // Layer 2: Entity (Top)
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0,0,50,50);
-}, "Cave");
-```
+| Feature | Description |
+| :--- | :--- |
+| **Multitasking Z-Stack** | Run multiple active layers simultaneously (Background, World, UI). |
+| **Instance Encapsulation** | Every layer is a `ChScene` instance with its own private `this` context. |
+| **Auto-Management** | Scenes can `pause()`, `run()`, `reset()`, or `kill()` themselves internally. |
+| **Safe Time-Step** | Built-in protection against lag spikes (Time Clamping) to keep physics stable. |
 
+---
 
-2. Performance: Init vs Script
-The init function is for setup. The script loop is for logic. Never initialize heavy variables or sprites inside the loop!
-Correct ✅ (Optimized):
-```js
-choppy.sceneCreate(
-    function(scene, ctx, delta) { 
-        // Logic: Move things
-        window.playerX += 10 * delta;
-    }, 
-    "Level1", 
-    function() { 
-        // Setup: Run once
-        window.playerX = 0; 
-    }
-);
-```
-Incorrect ❌ (Memory Leak):
-```js
-choppy.sceneCreate(function(scene, ctx, delta) {
-    window.playerX = 0; // ERROR: Resets every frame!
-    window.sprite = new openfl.display.Sprite(); // ERROR: 60 objects per second!
-}, "Level1");
-```
+## ✨ What's new in 2.0?
 
-🧩 Integration with OpenFL (Hybrid Mode)
-For frameworks like OpenFL, Choppy acts as the Logic Brain. Remeber that in Openfl or other frameworks with an system of charcaters, delete the global characters in the init of the next scene of that charcaters
-```js
-var choppy = new Choppy("myCanvas", false, true); // framework_Used = true
+### Added
+- **Layer Stacking:** Sequential execution of multiple active scenes (Z-Order).
+- **Instance-Based Logic:** Scenes are now `ChScene` instances with private `this` context.
+- **DNA Mutation (The "Blueprint" Trick):** 
+  - You can define `new ChScene()` molds as "blueprints" and store them without adding them to the engine.
+  - These blueprints consume zero CPU/Execution time until you decide to inject their scripts into a live layer.
+- **Dynamic Hot-Swapping:** Use `changeLayer()` to swap the logic (Init, Scene, End) of a live layer using a blueprint's DNA.
+- **Self-Management:** Built-in `pause()`, `run()`, `reset()`, and `kill()` for every layer.
+- **DeltaTime Clamping:** Lag protection capped at 100ms.
 
-choppy.sceneCreate(
-    function(scene, ctx, delta) {
-        window.player.x += 10 * delta; // Physics/Logic
-    },
-    "GameScene",
-    function() {
-        window.player = new openfl.display.Sprite(); // Visual Setup
-        openfl.Lib.current.stage.addChild(window.player);
-    }
-);
+### Changed
+- **High-Level Orchestration:** Refactored from a simple drawing manager to a framework-agnostic logic orchestrator.
+- **Execution Context:** Scripts run via `call(window, this)`, allowing professional OOP patterns and "Hot-Swapping" logic.
 
-// Call in OpenFL's ENTER_FRAME
-openfl.Lib.current.stage.addEventListener("enterFrame", function(e) {
-    choppy.play(true); // onlyFrameMode = true
-});
-```
+### Deprecated
+- **Numeric Indexes:** Removed scene selection by number. Management is now strictly name-based and layer-oriented for professional scalability.
 
-## 🚀 Quick Start (Speed-run style)
+---
 
-1. Setup your HTML
+## 📦 OpenFL Integration (Example)
+Choppy2d-js v2.0 works perfectly as a Logic Controller for OpenFL's rendering engine.
+
 ```html
-<canvas id="myCanvas" width="200" height="100"></canvas>
-<script src="choppy.js" alt="https://unpkg.com/choppy.js"></script>
-```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choppy2D v2.0 + OpenFL Demo</title>
+    <!-- 1. OpenFL Library via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/openfl@9.5.0/dist/openfl.min.js"></script>
+    <!-- 2. Your Engine (choppy.js) -->
+    <script src="choppy.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #111; }
+        canvas { display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
 
-2. Create your Game Logic
-```html
 <script>
-var choppy = new Choppy("myCanvas");
+    // --- OPENFL SETUP ---
+    const stage = new openfl.display.Stage(800, 600, 0xFFFFFF);
+    document.body.appendChild(stage.element);
 
-// Scene 1: Cave
-choppy.sceneCreate(function(scene, ctx, deltaTime) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0,0,200,100);
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0,0,50,50);
-}, "Cave");
+    // --- CHOPPY 2.0 LOGIC ---
+    const engine = new Choppy();
 
-// Scene 2: Dark Cave
-choppy.sceneCreate(function(scene, ctx, deltaTime) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(0,0,200,100);
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0,0,50,50);
-}, "DarkCave");
+    // Player Layer
+    engine.addLayer(
+        function(self) { 
+            if (this.sprite.x > 800) {
+                this.sprite.x = -50;
+            } else {
+                this.sprite.x += 200 * deltaTime;
+            }
+            this.sprite.rotation += 2;
+        }, 
+        "Player", 
+        function(self) { 
+            this.sprite = new openfl.display.Sprite();
+            this.sprite.graphics.beginFill(0x22AABB);
+            this.sprite.graphics.drawRect(-25, -25, 50, 50);
+            this.sprite.x = 100;
+            this.sprite.y = 300;
+            stage.addChild(this.sprite);
+        },
+        function(self) { 
+            stage.removeChild(this.sprite);
+        }
+    );
 
-choppy.play(); // Launch the game loop
+    // Run Engine
+    engine.play();
 
-// Example: Switch scene after 2 seconds
-setTimeout(() => {
-    choppy.setScene("DarkCave");
-}, 2000);
 </script>
+</body>
+</html>
 ```
-
-## 📜 Usage & Credits
-Attribution
-This project is licensed under the MIT License. You must keep the copyright notice. Please credit ChoppyJS in your project's README.md or Credits screen!
-Example: "Built with ChoppyJS by B4uti4GD"
-
-Made by me with a little help from AI 😉. Go build something fast!
+## 📜 License
+This project is licensed under the MIT License. You are free to use, modify, and distribute it as long as the copyright notice in the source code remains intact.
+Made with passion for the gamedev community with help of AI. Go build something fast! 🚀

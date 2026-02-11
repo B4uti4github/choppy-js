@@ -1,128 +1,109 @@
-// ChoppyJS - A simple JavaScript game abstraction script for 2D games
+/*
+   ____ _   _  ___  ____  ______   ______     _           _ ____  
+  / ___| | | |/ _ \|  _ \|  _ \ \ / /___ \ __| |         | / ___| 
+ | |   | |_| | | | | |_) | |_) \ V /  __) / _` |_____ _  | \___ \ 
+ | |___|  _  | |_| |  __/|  __/ | |  / __/ (_| |_____| |_| |___) |
+  \____|_|_|_|\___/|_|   |_|    |_| |_____\__,_|      \___/|____/ 
+ |___ \  / _ \                                                    
+   __) || | | |                                                   
+  / __/ | |_| |                                                   
+ |_____(_)___/                                                    
+                 
+ An Scene and layer manager for games and demos in their 2.0 :D
+*/
 
-// Disclaimer: This is a basic framework for building 2D games using JavaScript and HTML5 Canvas.
-// It provides scene management and layer drawing capabilities.
-// You can extend it further based on your game requirements.
-// But, This is an simple script for game making.
+class ChScene {
+    constructor(name, scene, init, end) {
+        this.name = name;
+        this.sceneScript = scene || function() {};
+        this.initScript = init || function() {};
+        this.endScript = end || function() {};
+        
+        this.i = 0;
+        this.active = true; 
+    }
 
-// Tips: 
+    step() {
+        if (this.i === 0) {
+            this.active = true;
+            this.initScript.call(window, this); 
+            this.i = 1;
+        }
+        if (this.active) {
+            this.sceneScript.call(window, this);
+        }
+    }
 
-//  1. Use setScene(index) to switch between scenes, and use sceneCreate(evalScene, name) for creating scenes.
-//  2. Use deltaTime for frame-independent movement.
-//  3. Access the current scene with 'scene' in scenes function scripts.
-//  4. Use The other function called Init for initialize variables or states when the scene starts in the momento of create an scene.
-//  5. You can simulate layers like this (without OnlyFrameMode and in 2d context):
-//
-//  choppy.sceneCreate(function(scene, ctx, deltaTime) {
-//    // Layer 1
-//    ctx.fillStyle = 'green';
-//    ctx.fillRect(0,0,200,100);
-//
-//    // Layer 2
-//    ctx.fillStyle = 'white';
-//    ctx.fillRect(0,0,50,50);
-//
-//  }, "Cave");
-//
-//  6. This is a basic framework, extend it as needed for your game with "this." + some var name for states.
-//  7. Remember to handle user input and game states within the eval scripts.
-//  8. Enjoy building your 2D games with ChoppyJS!
-//  9. For WebGL mode, consider using a framework like OpenFL for better handling within Enter_frame event and automatic clear for call the play wuth the OnlyFrameMode Argument.
+    pause() { this.active = false; }
+    run() { this.active = true; }
+    
+    reset() { 
+        this.endScript.call(window, this);
+        this.i = 0;
+    }
+
+    kill() { 
+        this.endScript.call(window, this);
+        this.active = false;
+    }
+}
 
 class Choppy {
-    constructor(canvasId, WebGLMode, framework_Used) {
-        
-        if(framework_Used){
-            
-        } else {
-            const canvas = document.getElementById(canvasId);
-            this.WebGLMode = WebGLMode ?? false;
-            if (!this.WebGLMode) {
-                this.ctx = canvas.getContext('2d');
-            } else {
-                this.ctx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            }
-        }
-        this.framework_Used = framework_Used || false;
-        this.iteracionInitAScene = 0;
-        this.scenes = [];
-        this.currentScene = 0;
+    constructor() {
+        this.layers = []; 
         this.lastTime = 0;
-        this.animationId = null;
     }
 
-    sceneCreate(Scene, name, init) {
-        // Guardamos script, nombre e init (con fallback a función vacía)
-        this.scenes.push({ 
-            script: Scene, 
-            name: name, 
-            init: init || function() {} 
-        });
+    addLayer(scene, name, init, end) {
+        const newLayer = new ChScene(name, scene, init, end);
+        this.layers.push(newLayer);
+        return newLayer; 
     }
 
-    setScene(index) {
-        let sceneIndex = -1;
-        if(typeof index === 'string') {
-            sceneIndex = this.scenes.findIndex(scene => scene.name === index);
-        } else if (typeof index === "number") {
-            if (index >= 0 && index < this.scenes.length) sceneIndex = index;
-        }
-
-        if (sceneIndex !== -1) {
-            this.currentScene = sceneIndex;
-            this.iteracionInitAScene = 0; // Reset para disparar el nuevo init()
+    removeLayer(name) {
+        const idx = this.layers.findIndex(l => l.name === name);
+        if (idx !== -1) {
+            this.layers[idx].kill();
+            this.layers.splice(idx, 1);
         }
     }
 
-    play(onlyFrameMode) {
-        this.lastTime = performance.now();
-        const executeInit = () => {
-            if(this.iteracionInitAScene === 0){
-                const scenary = this.scenes[this.currentScene];
-                if(scenary && scenary.init) scenary.init.call(window);
-                this.iteracionInitAScene = 1;
-            }
-        };
+    get(name) {
+        return this.layers.find(l => l.name === name);
+    }
 
-        if (onlyFrameMode) {
-            if(!this.framework_Used) return // Salir si no se usa un framework
+    changeLayer(name, newScene, newInit, newEnd) {
+        let layer = this.get(name);
+        if (layer) {
+            // 1. Cerramos el ciclo de la lógica anterior
+            layer.kill(); 
             
-            executeInit();
-            
-            if(!window.lastTime) window.lastTime = performance.now();
-            const now = performance.now();
-            window.delta = (now - window.lastTime) / 1000;
-            if (window.delta > 0.1) window.delta = 0.016; 
-            window.lastTime = now;
-            
-            const scene = this.scenes[this.currentScene];
-            scene.script.call(window, scene, window.delta);
+            // 2. Inyectamos el nuevo ADN (funciones)
+            layer.sceneScript = newScene || function() {};
+            layer.initScript = newInit || function() {};
+            layer.endScript = newEnd || function() {};
 
-        } else { 
-            if (!this.WebGLMode) { 
-                if(!this.framework_Used){
-                    executeInit();
+            layer.i = 0
+        }
+    }
 
-                    const loop = (timestamp) => {
-                        if (!this.frameworkUsed) {
-                            this.ctx.reset(); 
-                        }
-                        this.ctx.reset();
-                        if (!this.lastTime) this.lastTime = timestamp;
-                        const deltaTime = timestamp - this.lastTime;
-                        this.lastTime = timestamp;
-            
-                        const scene = this.scenes[this.currentScene];
-                        scene.script.call(window, scene, this.ctx, deltaTime);
-                        this.animationId = requestAnimationFrame(loop);
-                    };
 
-                    if (this.animationId) cancelAnimationFrame(this.animationId);
-                    this.animationId = requestAnimationFrame(loop);
+    play() {
+        const loop = (timestamp) => {
+            if (!this.lastTime) this.lastTime = timestamp;
+            const dt = timestamp - this.lastTime;
+            this.lastTime = timestamp;
+
+            if (dt < 100) {
+                window.deltaTime = dt / 1000;
+                for (let i = 0; i < this.layers.length; i++) {
+                    if (this.layers[i]) {
+                        this.layers[i].step();
+                    }
                 }
-            } else {
-                console.error("WebGL Mode is not supported yet... use onlyFrameMode.");
             }
-        }
+            requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
     }
 }
