@@ -1,15 +1,11 @@
 /*
-   ____ _   _  ___  ____  ______   ______     _           _ ____  
-  / ___| | | |/ _ \|  _ \|  _ \ \ / /___ \ __| |         | / ___| 
- | |   | |_| | | | | |_) | |_) \ V /  __) / _` |_____ _  | \___ \ 
- | |___|  _  | |_| |  __/|  __/ | |  / __/ (_| |_____| |_| |___) |
-  \____|_|_|_|\___/|_|   |_|    |_| |_____\__,_|      \___/|____/ 
- |___ \  / _ \                                                    
-   __) || | | |                                                   
-  / __/ | |_| |                                                   
- |_____(_)___/                                                    
-                 
- An Scene and layer manager for games and demos in their 2.0 :D
+   ____ _                             ____     _           _ ____    ____    _ 
+  / ___| |__   ___  _ __  _ __  _   _|___ \ __| |         | / ___|  |___ \  / |
+ | |   | '_ \ / _ \| '_ \| '_ \| | | | __) / _` |_____ _  | \___ \    __) | | |
+ | |___| | | | (_) | |_) | |_) | |_| |/ __/ (_| |_____| |_| |___) |  / __/ _| |
+  \____|_| |_|\___/| .__/| .__/ \__, |_____\__,_|      \___/|____/  |_____(_)_|
+                   |_|   |_|    |___/                                          
+ An Scene and layer manager for games and demos in their 2.1 :D
 */
 
 class ChScene {
@@ -21,6 +17,7 @@ class ChScene {
         
         this.i = 0;
         this.active = true; 
+        this.clampPause = true;
     }
 
     step() {
@@ -75,10 +72,8 @@ class Choppy {
     changeLayer(name, newScene, newInit, newEnd) {
         let layer = this.get(name);
         if (layer) {
-            // 1. Cerramos el ciclo de la lógica anterior
             layer.kill(); 
             
-            // 2. Inyectamos el nuevo ADN (funciones)
             layer.sceneScript = newScene || function() {};
             layer.initScript = newInit || function() {};
             layer.endScript = newEnd || function() {};
@@ -91,16 +86,25 @@ class Choppy {
     play() {
         const loop = (timestamp) => {
             if (!this.lastTime) this.lastTime = timestamp;
-            const dt = timestamp - this.lastTime;
+            const dt = (timestamp - this.lastTime) / 1000;
             this.lastTime = timestamp;
 
-            if (dt < 100) {
-                window.deltaTime = dt / 1000;
-                for (let i = 0; i < this.layers.length; i++) {
-                    if (this.layers[i]) {
-                        this.layers[i].step();
+            window.deltaTime = dt;
+
+            for (let i = 0; i <= this.layers.length - 1; i++) {
+                const layer = this.layers[i];
+                if (!layer) continue;
+
+               
+                if (layer.clampPause && layer.i !== 0) {
+                    if (dt > 0.1) {
+                        layer.active = false;
+                    } else {
+                        layer.active = true;
                     }
                 }
+                
+                layer.step();
             }
             requestAnimationFrame(loop);
         };

@@ -1,3 +1,18 @@
+# v2.1
+
+## Added
+- **Physics Integrity Shield (`clampPause`):** Implemented a per-layer safety mechanism that prevents logical corruption during extreme frame-rate fluctuations (Lag Spikes).
+- **Self-Healing Loop:** The engine now automatically suspends execution of layers marked with `clampPause` if `deltaTime` exceeds 100ms, effectively preventing "tunneling" or physics clipping.
+- **State-Aware Initialization:** Added protection to ensure `initScript` execution is never bypassed by the clamping logic, maintaining object lifecycle consistency.
+
+## Changed
+- **Time Handling:** Transitioned from "Fixed Delta Clamping" to "Dynamic Frame Suspension". The engine now preserves real-time fidelity (`window.deltaTime`) while shielding sensitive logic layers.
+- **Z-Stack Optimization:** Refactored the core loop to a boundary-checked linear iteration for maximum performance.
+
+## Fixed
+- **Lag-Induced Clipping:** Solved the "Geometry Dash" like issue where high lag spikes caused objects to pass through boundaries.
+
+
 # v2.0
 
 ## Added

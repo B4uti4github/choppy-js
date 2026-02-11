@@ -1,4 +1,4 @@
-# 🌊 Choppy2d-js v2.0
+# 🌊 Choppy2d-js v2.1
 > **An Scene and Layer manager for games and demos.**
 
 **Choppy2d-js** is a high-level logic orchestrator designed to manage scene complexity and multitasking through a robust **Layer System**. It is completely **framework-agnostic**, making it the perfect "Director" for any rendering engine.
@@ -15,26 +15,26 @@
 | **Safe Time-Step** | Built-in protection against lag spikes (Time Clamping) to keep physics stable. |
 
 ---
+## 🛡️ Physics Integrity & Frame Skipping
+Choppy2D-js v2.1 introduces **Self-Healing Logic**, a feature designed for high-precision games (Platformers, Rhythm games, etc.).
 
-## ✨ What's new in 2.0?
+When a browser lag spike occurs, traditional engines often process a huge `deltaTime`, causing objects to clip through walls or bypass collision triggers. Choppy2D-js solves this with `clampPause`:
+
+- **Automatic Suspension:** If a frame takes longer than 100ms, layers with `clampPause` enabled will temporarily suspend their `sceneScript`.
+- **Zero Corruption:** This ensures that physics calculations never process "impossible" time jumps.
+- **Network Ready:** You can disable `clampPause` for Network/Socket layers to maintain real-time synchronization with a server while keeping your local physics safe.
+
+---
+
+## ✨ What's new in 2.1?
 
 ### Added
-- **Layer Stacking:** Sequential execution of multiple active scenes (Z-Order).
-- **Instance-Based Logic:** Scenes are now `ChScene` instances with private `this` context.
-- **DNA Mutation (The "Blueprint" Trick):** 
-  - You can define `new ChScene()` molds as "blueprints" and store them without adding them to the engine.
-  - These blueprints consume zero CPU/Execution time until you decide to inject their scripts into a live layer.
-- **Dynamic Hot-Swapping:** Use `changeLayer()` to swap the logic (Init, Scene, End) of a live layer using a blueprint's DNA.
-- **Self-Management:** Built-in `pause()`, `run()`, `reset()`, and `kill()` for every layer.
-- **DeltaTime Clamping:** Lag protection capped at 100ms.
+- **Physics Integrity Shield (`clampPause`):** Implemented a per-layer safety mechanism that prevents logical corruption during extreme frame-rate fluctuations (Lag Spikes).
+- **Self-Healing Loop:** The engine now automatically suspends execution of layers marked with `clampPause` if `deltaTime` exceeds 100ms, effectively preventing "tunnelling" or physics clipping.
+- **State-Aware Initialization:** Added protection to ensure `initScript` execution is never bypassed by the clamping logic, maintaining object lifecycle consistency.
 
 ### Changed
-- **High-Level Orchestration:** Refactored from a simple drawing manager to a framework-agnostic logic orchestrator.
-- **Execution Context:** Scripts run via `call(window, this)`, allowing professional OOP patterns and "Hot-Swapping" logic.
-
-### Deprecated
-- **Numeric Indexes:** Removed scene selection by number. Management is now strictly name-based and layer-oriented for professional scalability.
-
+- **Time Handling:** Transitioned from "Fixed Delta Clamping" to "Dynamic Frame Suspension". The engine now preserves real-time fidelity (`window.deltaTime`) while shielding sensitive logic layers.
 ---
 
 ## 📦 OpenFL Integration (Example)
