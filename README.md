@@ -1,5 +1,7 @@
+
+
 # 🌊 Choppy2d-js v2.1
-> **An Scene and Layer manager for games and demos.**
+> **A Scene and Layer manager for games and demos.**
 
 **Choppy2d-js** is a high-level logic orchestrator designed to manage scene complexity and multitasking through a robust **Layer System**. It is completely **framework-agnostic**, making it the perfect "Director" for any rendering engine.
 
